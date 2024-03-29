@@ -1,40 +1,40 @@
 pipeline {
     agent any
 	tools {
-	    maven "3.6.3"
+	    maven "maven-home"
 	 	}
 	stages {
 	    stage('Git CheckOut') {
 		    steps {
-			   git branch: 'main', credentialsId: 'My private token login creds', url: 'https://github.com/logicopslab/WebAppForJenkins.git'
+			   git branch: 'main', credentialsId: 'jenkins', url: 'https://github.com/SannapureddyBhanu/JenkinsAutomation.git'
 			}
 		}
         stage('Clean and Install') {
             steps {
-                bat 'mvn clean install'
+                sh "mvn clean install"
             }
         }
-        stage ('Package'){
+        stage ('Package') {
             steps {
-                bat 'mvn package'
+                sh "mvn package"
              }
         }
-	stage ('Server'){
+	stage ('Server') {
             steps {
                rtServer (
-                 id: "Artifactory",
-                 url: 'http://localhost:8082/artifactory',
-                 username: 'ravish',
-                  password: 'YouPasswordHere',
+                 id: "Jfrog",
+                 url: 'http://65.0.101.235:8082',
+                 username: 'admin',
+                  password: 'Vamsee@21',
                   bypassProxy: true,
                    timeout: 300
                         )
             }
         }
-        stage('Upload'){
+        stage('Upload') {
             steps{
                 rtUpload (
-                 serverId:"Artifactory" ,
+                 serverId:"Jfrog" ,
                   spec: '''{
                    "files": [
                       {
@@ -49,7 +49,7 @@ pipeline {
         stage ('Publish build info') {
             steps {
                 rtPublishBuildInfo (
-                    serverId: "Artifactory"
+                    serverId: "Jfrog"
                 )
             }
         }
